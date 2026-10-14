@@ -2,8 +2,9 @@
 
 Spin a random restaurant matched to your **movie taste**. Preference signals
 (movies you love) are sent to the [Qloo Taste API](https://docs.qloo.com/reference/api-overview),
-whose cross-domain graph maps cultural taste → restaurant affinity. A pure-CSS 3D
-carousel spins and lands on your pick, shown with **latitude/longitude** (no maps).
+whose cross-domain graph maps cultural taste → restaurant affinity. A **three.js**
+spinner lands on your pick, shown with **latitude/longitude** that open in your
+device's navigation app (no embedded map, no Maps API key).
 
 ## Stack
 
@@ -22,10 +23,12 @@ app/
   api/restaurants/route.ts  # POST restaurant pool (Qloo /v2/insights)
 components/
   PreferencePicker.tsx      # location + movie multi-select
-  Spinner3D.tsx             # pure-CSS 3D carousel reveal
+  Spinner3D.tsx             # three.js drum reveal, lazily imported
   RestaurantCard.tsx        # reveal card with lat/long + save
 lib/
   qloo/{types,query,client,config}.ts   # typed, pure, DI service layer
+  spinner/{drum,label-texture}.ts       # three.js drum + canvas card textures
+  maps/link.ts                          # per-platform navigation deep links
   firebase/{client,favorites,use-favorites}.ts
 firestore.rules             # per-user favorites security rules
 ```
@@ -63,8 +66,19 @@ save/favorites UI.
 
 ## Deploy to Vercel
 
-Set the project **Root Directory** to `appfiles`, then add the same environment
-variables in Vercel → Project → Settings → Environment Variables.
+The project is **connected to GitHub** (`ressanoid/randomized-restaurants`):
+pushing to `main` deploys to production, and pull requests get preview builds.
+There is no manual deploy step.
+
+Because the app lives in `appfiles/` rather than the repo root, two settings make
+that work:
+
+- **Root Directory** = `appfiles` — required, since there is no `package.json` at
+  the repo root and the build would otherwise fail.
+- The variables from [Environment](#environment-envlocal) above, set in Vercel →
+  Project → Settings → Environment Variables for **Production** and **Preview**.
+
+To deploy manually instead: `cd appfiles && npx vercel --prod`.
 
 ## Qloo API notes (learned the hard way)
 
