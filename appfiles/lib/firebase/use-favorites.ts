@@ -20,13 +20,14 @@ export const useFavorites = (): FavoritesApi => {
   const enabled = useMemo(() => isFirebaseConfigured(), []);
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<FavoriteRestaurant[]>([]);
-  const [ready, setReady] = useState(false);
+  const [bootstrapped, setBootstrapped] = useState(false);
+
+  // With no Firebase config there is nothing to bootstrap, so readiness is
+  // derived rather than written into state from inside the effect.
+  const ready = !enabled || bootstrapped;
 
   useEffect(() => {
-    if (!enabled) {
-      setReady(true);
-      return;
-    }
+    if (!enabled) return;
 
     let active = true;
     ensureAnonymousUser()
@@ -38,7 +39,7 @@ export const useFavorites = (): FavoritesApi => {
       })
       .catch(() => undefined)
       .finally(() => {
-        if (active) setReady(true);
+        if (active) setBootstrapped(true);
       });
 
     return () => {

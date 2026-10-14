@@ -30,12 +30,13 @@ export function PreferencePicker({
   const [searching, setSearching] = useState(false);
   const selectedIds = new Set(movies.map((movie) => movie.id));
 
+  // A query shorter than the minimum has no results by definition, so that case
+  // is derived at render time rather than written into state from the effect.
+  const query = term.trim();
+  const visibleResults = query.length < MIN_QUERY_LENGTH ? [] : results;
+
   useEffect(() => {
-    const query = term.trim();
-    if (query.length < MIN_QUERY_LENGTH) {
-      setResults([]);
-      return;
-    }
+    if (query.length < MIN_QUERY_LENGTH) return;
 
     const controller = new AbortController();
     const timer = setTimeout(() => {
@@ -51,7 +52,7 @@ export function PreferencePicker({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [term]);
+  }, [query]);
 
   const addMovie = (movie: MovieOption) => {
     if (selectedIds.has(movie.id) || movies.length >= MAX_MOVIES) return;
@@ -95,9 +96,9 @@ export function PreferencePicker({
 
           {searching && <p className="mt-1 text-xs opacity-60">Searching…</p>}
 
-          {results.length > 0 && (
+          {visibleResults.length > 0 && (
             <ul className="mt-2 max-h-52 overflow-y-auto rounded-xl border border-black/10 dark:border-white/10">
-              {results.map((movie) => (
+              {visibleResults.map((movie) => (
                 <li key={movie.id}>
                   <button
                     type="button"
