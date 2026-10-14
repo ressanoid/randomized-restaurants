@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+
+# dependencies
+node_modules/
+
+# builds
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# agent scratch (sessions, task graphs)
+.tmp/
+
+# agent tooling — local-only, regenerated from remote skill sources
+.agents/
+.opencode/
+skills-lock.json
+
+# env files — never commit secrets; templates are fine
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
